@@ -26,6 +26,7 @@ function Dashboard() {
         const laneObject ={
             laneId: laneId,
             laneTittle: laneInput.laneTittle,
+            cards: []
         }
         // check if local storage already has lane property
         if(localStorage.lanes){
@@ -60,11 +61,11 @@ function Dashboard() {
         const newCopy = [...allLanes]
         // filtering the array to remove the selected lane and saving it in a new array
 
-        const filteredArray = newCopy.filter(lane=> {return lane.laneId!= laneId})
+        const filteredArray = newCopy.filter(lane=> {return lane.laneId!== laneId})
         
         localStorage.setItem("lanes",  JSON.stringify(filteredArray))
-        loadData()
 
+        loadData()
     }
     const addCard=(e)=>{
         const cardId = uuidv4()
@@ -75,8 +76,7 @@ function Dashboard() {
             setAlert({show:true, alertText:'Please provide title of the Card'});
             return;
         }
-        console.log(cardInput)
-        // adding the id to the card obje
+        // adding the id to the card object
         const newCardObj={...cardInput, id: cardId}
         // add the card to the specific lane
         const newCopy = [...allLanes]
@@ -86,9 +86,6 @@ function Dashboard() {
                 // check if the lane has property of card
                 if(lane.cards){
                     lane.cards.push(newCardObj)
-                }else {
-                    // if no property of cards
-                    lane.cards = [newCardObj]
                 }
                 // console.log(lane)
             }
@@ -96,12 +93,12 @@ function Dashboard() {
         console.log('newCopy', newCopy)
         localStorage.setItem("lanes",  JSON.stringify(newCopy))
         setAlert({show: true, alertText: 'Lane successfully added'})
-        setCardInput({cardTittle: '', cardType: 'Bug', laneId: ''})
+        setCardInput({cardTittle: '', cardType: 'BUG', laneId: ''})
         setShowAddCardForm(false)
         setTimeout(() => {
             setShowModal(!showModal)
             setAlert({show: false, alertText: ''})
-        }, 1500);
+        }, 500);
     }
     const deleteCard=(laneId, cardId)=>{
         const newCopy =[...allLanes]
@@ -109,7 +106,7 @@ function Dashboard() {
             if(lane.laneId ===laneId){
                 // filter the cards of the lane with the cardId
                 const filteredCardsArray=lane.cards.filter(card=>{
-                    return card.id != cardId
+                    return card.id !== cardId
                 })
                 lane.cards=filteredCardsArray
             }
@@ -164,16 +161,21 @@ function Dashboard() {
         e.preventDefault();
         if(draggedCard.laneId === lane.laneId){
             console.log('dont do anything else')
+            // if the cards are dropped in their original lane do nothing
+            return
         }else{
-            // console.log(lane)
-            console.log('draggedCard:', draggedCard)
+            // copy the lanes
             const newLanes= [...allLanes]
             newLanes.forEach(eachLane=>{
+                // finding out which lane was dropped on
                 if(lane.laneId === eachLane.laneId){
+                    // copying the card as a new card
                     const newCard = {...draggedCard}
                     newCard.laneId = lane.laneId
-                    // push this card into the lane. 
+                    // push this card into the lane.
+                    // first check if the card 
                     if(eachLane.cards){
+
                         eachLane.cards.push(newCard)
                     }else{
                         eachLane.cards = [newCard]
@@ -181,7 +183,7 @@ function Dashboard() {
                 }
                 if(draggedCard.laneId===eachLane.laneId){
                     const filteredCardsArray = eachLane.cards.filter(card=>{
-                        return card.id != draggedCard.id
+                        return card.id !== draggedCard.id
                     })
                     eachLane.cards = filteredCardsArray
                 }
@@ -191,7 +193,6 @@ function Dashboard() {
             localStorage.setItem("lanes",  JSON.stringify(newLanes))
             loadData()
         }
-        // add the card to the lane
     }
     const startDragging = (e, card)=>{
         // e.preventDefault();
@@ -266,7 +267,7 @@ function Dashboard() {
                         <button className='addCardBtn' onClick={()=>openModal('addCard', lane.laneId)}><i className="fas fa-plus"></i></button>
                         <ul className="laneContent">
                             {
-                                lane.cards?
+                                lane.cards.length>0?
                                 lane.cards.map(card=>
                                     <li className='card' key={card.id} draggable="true" onDragStart={(e)=>startDragging(e,card)}>
                                         <div className="flexRow justifyCntBtwn w100">

@@ -144,3 +144,6 @@
 .card:hover .deleteCardBtn, .card:focus .deleteCardBtn{
     color: #555555;
 }
+.card h4{
+    margin: 10px auto;
+}
