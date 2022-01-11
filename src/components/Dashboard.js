@@ -90,7 +90,6 @@ function Dashboard() {
                 // console.log(lane)
             }
         })
-        console.log('newCopy', newCopy)
         localStorage.setItem("lanes",  JSON.stringify(newCopy))
         setAlert({show: true, alertText: 'Lane successfully added'})
         setCardInput({cardTittle: '', cardType: 'BUG', laneId: ''})
@@ -286,11 +285,11 @@ function Dashboard() {
                 )
                 :
                 <div className="lane">
-                    <h3>there are currently no lanes</h3>
+                    <h4>there are currently no lanes</h4>
                 </div>
             }
                 <div className="lane">
-                    <h3>create new lane</h3>
+                    <h4>create new lane</h4>
                     <button className="card" onClick={()=>openModal('addLane')}><i className="fas fa-plus"></i></button>
                 </div>
             </div>
