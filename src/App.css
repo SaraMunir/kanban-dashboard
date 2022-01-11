@@ -26,6 +26,9 @@ form{
 .justifyCntEnd{
   justify-content: end;
 }
+.justifyCntBtwn{
+  justify-content: space-between;
+}
 .w100{
   width: 100%;
 }
@@ -33,4 +36,10 @@ form{
   background: rgb(252, 215, 113);
   font-size: 1.2rem;
   padding: 10px;
+}
+ul {
+  padding: 0;
+}
+li {
+  list-style: none;
 }

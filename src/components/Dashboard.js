@@ -1,54 +1,121 @@
 import React, {useEffect, useState, useRef} from 'react'
 import './Styles/general.css';
 import { v4 as uuidv4 } from 'uuid';
-import firebase from '../firebase';
 
 function Dashboard() {
-    const [userId, setUserId]=useState('')
     const [showModal, setShowModal]=useState(false)
     const [showAddLaneForm, setShowAddLaneForm]=useState(false)
     const [showAddCardForm, setShowAddCardForm]=useState(false)
     const [laneInput, setLaneInput]=useState({laneTittle: ''})
-    const [cardInput, setCardInput]=useState({cardTittle: '', cardType: 'Bug', laneId: ''});
+    const [cardInput, setCardInput]=useState({cardTittle: '', cardType: 'BUG', laneId: ''});
     const [alert, setAlert] = useState({show: false, alertText: ''})
+    const [allLanes, setAllLanes]=useState([]);
+    const [draggedCard, setDraggedCard]=useState({})
     const inputLaneTittle = useRef();
-    const [allLanes, setAllLanes]=useState([])
-// 
+    const inputCardTittle = useRef();
+    
     const addLane=(e)=>{
         const laneId = uuidv4()
         e.preventDefault()
+        // checking that uesr input is not empty
         if(laneInput.laneTittle===''){
             inputLaneTittle.current.focus();
-            setAlert({show:true, alertText:'Please provide title of Lane'})
+            setAlert({show:true, alertText:'Please provide title of Lane'});
+            return;
         }
-        console.log(laneInput)
         const laneObject ={
             laneId: laneId,
-            laneTittle: laneInput.laneTittle
+            laneTittle: laneInput.laneTittle,
         }
-        // console.log(laneObject, userId)
-        const dbRef = firebase.database().ref(`${userId}`)
-        dbRef.push(laneObject).then(()=>{
-            // console.log("Data saved successfully.");
+        // check if local storage already has lane property
+        if(localStorage.lanes){
+            const copyAllLanes=[...allLanes]
+            //  then push new object to the new array
+            copyAllLanes.push(laneObject)
+            // update local storage
+            localStorage.setItem("lanes",  JSON.stringify(copyAllLanes))
             setAlert({show: true, alertText: 'Lane successfully added'})
             setLaneInput({laneTittle: ''})
             setShowAddLaneForm(false)
             setTimeout(() => {
                 setShowModal(!showModal)
                 setAlert({show: false, alertText: ''})
-            }, 1500);
-        }).catch((error)=> {
-            // console.log("Data could not be saved." + error);
-            setAlert({show:true, alertText:`The lane could not be saved. because of ${error}`})
-        });
+                loadData()
+            }, 800);
+        }else{
+            const laneArray = [laneObject]
+            localStorage.setItem("lanes",  JSON.stringify(laneArray))
+            setAlert({show: true, alertText: 'Lane successfully added'})
+            setLaneInput({laneTittle: ''})
+            setShowAddLaneForm(false)
+            setTimeout(() => {
+                setShowModal(!showModal)
+                setAlert({show: false, alertText: ''})
+                loadData()
+            }, 800);
+        }
     }
     const deleteLane =(laneId)=>{
-        const dbRef = firebase.database().ref(`${userId}/${laneId}`)
-        dbRef.remove()
+        // copy all lanes
+        const newCopy = [...allLanes]
+        // filtering the array to remove the selected lane and saving it in a new array
+
+        const filteredArray = newCopy.filter(lane=> {return lane.laneId!= laneId})
+        
+        localStorage.setItem("lanes",  JSON.stringify(filteredArray))
+        loadData()
+
     }
     const addCard=(e)=>{
+        const cardId = uuidv4()
         e.preventDefault()
+        //  confirm if user input is not empty
+        if(cardInput.cardTittle===''){
+            inputCardTittle.current.focus();
+            setAlert({show:true, alertText:'Please provide title of the Card'});
+            return;
+        }
         console.log(cardInput)
+        // adding the id to the card obje
+        const newCardObj={...cardInput, id: cardId}
+        // add the card to the specific lane
+        const newCopy = [...allLanes]
+        newCopy.forEach(lane=>{
+            // fine the lane 
+            if(lane.laneId === newCardObj.laneId){
+                // check if the lane has property of card
+                if(lane.cards){
+                    lane.cards.push(newCardObj)
+                }else {
+                    // if no property of cards
+                    lane.cards = [newCardObj]
+                }
+                // console.log(lane)
+            }
+        })
+        console.log('newCopy', newCopy)
+        localStorage.setItem("lanes",  JSON.stringify(newCopy))
+        setAlert({show: true, alertText: 'Lane successfully added'})
+        setCardInput({cardTittle: '', cardType: 'Bug', laneId: ''})
+        setShowAddCardForm(false)
+        setTimeout(() => {
+            setShowModal(!showModal)
+            setAlert({show: false, alertText: ''})
+        }, 1500);
+    }
+    const deleteCard=(laneId, cardId)=>{
+        const newCopy =[...allLanes]
+        newCopy.forEach(lane=>{
+            if(lane.laneId ===laneId){
+                // filter the cards of the lane with the cardId
+                const filteredCardsArray=lane.cards.filter(card=>{
+                    return card.id != cardId
+                })
+                lane.cards=filteredCardsArray
+            }
+        })
+        localStorage.setItem("lanes",  JSON.stringify(newCopy))
+        loadData()
     }
     const handleInput=(e, type)=>{
         const {id, value} = e.target
@@ -58,6 +125,10 @@ function Dashboard() {
         if(type=== "card"){
             setCardInput({...cardInput,[id]:value})
         }
+    }
+    const handleTypeInput=(e)=>{
+        const {id, value} = e.target;
+        setCardInput({...cardInput,[id]:value})
     }
     const openModal =(type, laneId)=>{
         setShowModal(!showModal)
@@ -77,40 +148,58 @@ function Dashboard() {
         setShowAddLaneForm(false)
         setAlert({show: false, alertText: ''})
     }
-    useEffect(()=>{
-        let userId
-        // to check if user is online or offline
-        // console.log(navigator.onLine)
-        // console.log(localStorage.userId)
-        // check if userId available in local storage. 
-        if(localStorage.userId){
-            setUserId(localStorage.userId)
-            firebase.database().ref(`${localStorage.userId}`).on('value', (response)=>{
-                const laneArray=[]
-                const data = response.val()
-                // console.log(data)
-                for (let key in data) {
-                    laneArray.push({...data[key], id: key})
-                }
-                setAllLanes(laneArray)
-            })
+    const loadData = ()=>{
+        // check if local storage has lanes object
+        if(localStorage.lanes){
+            // console.log(JSON.parse(localStorage.lanes))
+            setAllLanes(JSON.parse(localStorage.lanes))
         }else {
-            const userId = uuidv4();
-            // console.log('local storage user id does not xists')
-            // create unique id for user
-            localStorage.setItem('userId', userId)
-            setUserId(userId)
-            firebase.database().ref(`${userId}`).on('value', (response)=>{
-                const laneArray=[]
-                const data = response.val()
-                // console.log(data)
-                for (let key in data) {
-                    laneArray.push({...data[key], id: key})
-                }
-                setAllLanes(laneArray)
-            })
-
+            console.log('no local storage')
         }
+    }
+    const allowDrop = (e)=>{
+        e.preventDefault();
+    }
+    const dropCard = (e, lane)=>{
+        e.preventDefault();
+        if(draggedCard.laneId === lane.laneId){
+            console.log('dont do anything else')
+        }else{
+            // console.log(lane)
+            console.log('draggedCard:', draggedCard)
+            const newLanes= [...allLanes]
+            newLanes.forEach(eachLane=>{
+                if(lane.laneId === eachLane.laneId){
+                    const newCard = {...draggedCard}
+                    newCard.laneId = lane.laneId
+                    // push this card into the lane. 
+                    if(eachLane.cards){
+                        eachLane.cards.push(newCard)
+                    }else{
+                        eachLane.cards = [newCard]
+                    }
+                }
+                if(draggedCard.laneId===eachLane.laneId){
+                    const filteredCardsArray = eachLane.cards.filter(card=>{
+                        return card.id != draggedCard.id
+                    })
+                    eachLane.cards = filteredCardsArray
+                }
+            })
+            // deleting the card from the owning lane
+
+            localStorage.setItem("lanes",  JSON.stringify(newLanes))
+            loadData()
+        }
+        // add the card to the lane
+    }
+    const startDragging = (e, card)=>{
+        // e.preventDefault();
+        setDraggedCard(card)
+    }
+    useEffect(()=>{
+        // loading all the data
+        loadData()
     }, [])
     return (
         <section className='dashboard'>
@@ -138,14 +227,15 @@ function Dashboard() {
                     {
                         showAddCardForm ?
                         <form onSubmit={(e)=>addCard( e, "card" )}>
-                            <label htmlFor="cardTittle">Provide Lane Tittle</label>
+                            <label htmlFor="cardTittle">Provide Card Tittle</label>
                             <input type="text" id='cardTittle' 
                             value={cardInput.cardTittle} 
                             onChange={(e)=>handleInput(e,"card")}
+                            ref ={inputCardTittle}
                             placeholder='Enter Card Tittle'
                             />
                             <label htmlFor="cardType">select Type</label>
-                            <select name="cardType" id="cardType" 
+                            <select name="cardType" id="cardType" onChange={handleTypeInput}
                                 defaultValue={cardInput.cardType} required>
                                 <option hidden>BUG</option>
                                 <option value="BUG">BUG</option>
@@ -166,21 +256,32 @@ function Dashboard() {
             : null
             }
             <div className='dashboardCntnr'>
-               
                 {allLanes.length>0?
                 allLanes.map(lane=>
-
-                <div key={lane.laneId} className="lane">
-                    <div className="flexRow justifyCntEnd w100">
-                        <button onClick={()=>deleteLane(lane.id)}><i className="fas fa-times"></i></button>
+                    <div key={lane.laneId} className="lane"  onDragOver={allowDrop} onDrop={(e)=>dropCard(e, lane)}>
+                        <div className="flexRow justifyCntBtwn w100">
+                            <h3>{lane.laneTittle} &nbsp;{lane.cards?`(${lane.cards.length})`:null}</h3>
+                            <button className='deleteLaneBtn' onClick={()=>deleteLane(lane.laneId)}><i className="fas fa-times"></i></button>
+                        </div>
+                        <button className='addCardBtn' onClick={()=>openModal('addCard', lane.laneId)}><i className="fas fa-plus"></i></button>
+                        <ul className="laneContent">
+                            {
+                                lane.cards?
+                                lane.cards.map(card=>
+                                    <li className='card' key={card.id} draggable="true" onDragStart={(e)=>startDragging(e,card)}>
+                                        <div className="flexRow justifyCntBtwn w100">
+                                            <p className={`cardType ${card.cardType}`}><i className="fas fa-circle"></i> {card.cardType}</p>
+                                            <button className='deleteCardBtn' onClick={()=>deleteCard(lane.laneId, card.id)}><i className="fas fa-times"></i></button>
+                                        </div>
+                                        <h4>{card.cardTittle}</h4>
+                                    </li>
+                                    )
+                                : 
+                                <li className='card'>No cards</li>
+                            }
+                            <li className='emptyCard'>move card here</li>
+                        </ul>
                     </div>
-                    <h3>{lane.laneTittle}</h3>
-                    <button className='addCardBtn' onClick={()=>openModal('addCard', '123')}><i className="fas fa-plus"></i></button>
-
-                    <div className="laneContent">
-
-                    </div>
-                </div>
                 )
                 :
                 <div className="lane">
@@ -189,7 +290,7 @@ function Dashboard() {
             }
                 <div className="lane">
                     <h3>create new lane</h3>
-                    <button className="card" onClick={()=>openModal('addLane')}>+</button>
+                    <button className="card" onClick={()=>openModal('addLane')}><i className="fas fa-plus"></i></button>
                 </div>
             </div>
         </section>

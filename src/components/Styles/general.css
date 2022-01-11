@@ -12,7 +12,7 @@
     /* background: #e8ebe3; */
 }
 .lane {
-    background: rgba(235, 247, 242, 0.849);
+    background: #F2F7F8;
     /* border: 1px solid rgb(66, 71, 57); */
     min-height: 30vh;
     width: 250px;
@@ -26,13 +26,42 @@
     padding: 10px;
     border-radius: 10px;
     width: 100%;
-    cursor: pointer;
+    cursor: grab;
     border: none;
     box-shadow: 0px 5px 5px rgb(155, 150, 150);
+    margin: 10px auto;
+}
+.emptyCard{
+    min-height: 10vh;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    border: 2px dotted #a3a3a365;
+    background: #d1d1d165;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: .9rem;
+    font-weight: bold;
+    color: #747474;
 }
 .card:active{
     box-shadow: 0px 1px 1px rgb(155, 150, 150);
 
+}
+.cardType{
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: bolder;
+}
+.BUG {
+    color: #f04646;
+}
+.FEATURE {
+    color: #00aeff;
+}
+.REQUEST {
+    color: #23cfa4;
 }
 .modalWindow{
     background: #000000c0;
@@ -83,10 +112,35 @@
     padding: 10px;
     margin: 10px auto;
 }
-
-
 .addCardBtn{
-    background: #d4f3e6ee;
+    background: #D1E3E7;
     width: 100%;
-    color: #50a581;
+    color: #4f95a0;
+    border-radius: 5px;
+    box-shadow: 0px 2px 2px #4f95a08f;
+    transition: .3s;
+}
+.addCardBtn:hover, .addCardBtn:focus {
+    background: #4f95a0;
+    color: #D1E3E7;
+
+}
+.deleteLaneBtn{
+    background: none;
+    opacity: 0;
+    transition: .4s;
+}
+.lane:hover .deleteLaneBtn, .lane:focus .deleteLaneBtn{
+    opacity: 1;
+}
+.deleteLaneBtn:hover, .deleteLaneBtn:focus{
+    opacity: 1;
+}
+.deleteCardBtn{
+    background: none;
+    color: #d8d8d8;
+    transition: .4s;
+}
+.card:hover .deleteCardBtn, .card:focus .deleteCardBtn{
+    color: #555555;
 }
