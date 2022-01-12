@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
-
+    
     const [cardDetail, setCardDetail]=useState({})
     const [cardColors, setCardColors]=useState([])
     const [showDescriptionForm, setShowDescriptionForm]=useState(false)
@@ -131,7 +131,8 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
     }
     useEffect(()=>{
         loadDetails()
-    },[])
+        console.log('what?')
+    },[showDescriptionForm])
     return (
         <div className='cardDetail'>
             <h3><i className="fas fa-credit-card"></i> {cardDetail.cardTittle}</h3>
