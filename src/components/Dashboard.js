@@ -17,13 +17,14 @@ function Dashboard() {
     const [selectedCard, setSelectedCard] =  useState({})
     const [allLanes, setAllLanes]=useState([]);
     const [draggedCard, setDraggedCard]=useState({})
+    const [laneTitle, setLaneTitle]=useState('')
     const inputLaneTittle = useRef();
     const inputCardTittle = useRef();
     
     const addLane=(e)=>{
         const laneId = uuidv4()
         e.preventDefault()
-        // checking that uesr input is not empty
+        // checking that user input is not empty
         if(laneInput.laneTittle===''){
             inputLaneTittle.current.focus();
             setAlert({show:true, alertText:'Please provide title of Lane'});
@@ -228,6 +229,7 @@ function Dashboard() {
             }
         })
         setAllLanes([...newArr])
+        setLaneTitle(value)
     }
     const cancelEdit=()=>{
         setEditInput({show:false, laneId:''})
@@ -235,10 +237,16 @@ function Dashboard() {
     }
     const saveLaneTiltleName=(e)=>{
         e.preventDefault()
-        const newArr=[...allLanes]
-        setEditInput({show:false, laneId:''})
-        localStorage.setItem("lanes",  JSON.stringify(newArr))
-        loadData()
+        if(laneTitle.length>0){
+            const newArr=[...allLanes]
+            setEditInput({show:false, laneId:''})
+            localStorage.setItem("lanes",  JSON.stringify(newArr))
+            loadData()
+        }else {
+
+            loadData()
+            setEditInput({show:false, laneId:''})
+        }
     }
     useEffect(()=>{
         // loading all the data
