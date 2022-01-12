@@ -20,6 +20,7 @@
     margin: 5px;
     padding: 10px 20px;
     border-radius: 10px;
+    position: relative;
 }
 .card {
     background: white;
@@ -30,8 +31,37 @@
     border: none;
     box-shadow: 0px 5px 5px rgb(155, 150, 150);
     margin: 10px auto;
+    position: relative;
 }
-
+.cardMenu{
+    width: 125px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e6f1f3;
+    z-index: 20;
+    /* padding: 20px; */
+}
+.cardMenu li {
+    border: 1px solid #c8d1d3;
+    cursor: pointer;
+}
+.cardMenu li button{
+    padding-left: 20px;
+    width: 100%;
+    background: none;
+    font-size: .8rem;
+    color: #406b72;
+    text-align: left;
+}
+.cardDetail{
+    width: 100%;
+    text-align: left;
+    min-height: 50vh;
+}
+.cardDetail h3{
+    margin: 10px 0;
+}
 .emptyCard{
     min-height: 10vh;
     padding: 10px;
@@ -48,13 +78,18 @@
 }
 .card:active{
     box-shadow: 0px 1px 1px rgb(155, 150, 150);
-    
-
 }
 .cardType{
     font-size: .8rem;
     text-transform: uppercase;
     font-weight: bolder;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.cardType i {
+    font-size: .5rem;
+    padding-right: 5px;
 }
 .BUG {
     color: #f04646;
@@ -75,6 +110,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 50;
 }
 .modal{
     background: white;
@@ -125,7 +161,9 @@
 .addCardBtn:hover, .addCardBtn:focus {
     background: #4f95a0;
     color: #D1E3E7;
-
+}
+.saveBtn{
+    background: #4f95a0;
 }
 .deleteLaneBtn{
     background: none;
@@ -149,4 +187,126 @@
 .card h4{
     margin: 10px auto;
     text-transform: capitalize;
+}
+.laneTitle, .editTitleInput{
+    margin: 10px auto;
+    text-transform: capitalize;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.editTitleInput{
+    width: 100%;
+    font-size: 1.1rem;
+    border: 2px solid #4f95a0;
+}
+.editForm{
+    width: 90%;
+}
+.cancelEdit{
+    background: none;
+    width: 10%;
+    font-size: .8rem;
+}
+.cardDesc form{
+    width: 100%;
+}
+.cardDesc .btn {
+    min-width: 50px;
+}
+.cardDesc h4 {
+    margin: 5px auto;
+}
+.descFormActive{
+    min-height: 8vh;
+    padding: 15px;
+    border: 2px solid #4f95a0;
+    min-width: 100%;
+    max-width: 100%;
+    margin: 5px auto;
+}
+.descFormInactive{
+    border: none;
+    outline: none;
+    background: #b7d0d4;
+    padding: 15px;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 4vh;
+}
+.descFormActive:active, .descFormActive:focus{
+    border: 2px solid #4f95a0;
+    outline:2px solid #4f95a0;
+    ;
+}
+.labelContainer{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* border: 1px solid red; */
+}
+.labelMenu{
+    width: 200px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    background: #e6f1f3;
+    padding: 10px;
+    min-height: 180px;
+
+}
+.red {
+    background: rgb(226, 90, 80);
+}
+.green {
+    background: rgb(116, 226, 171);
+}
+.blue {
+    background: rgb(116, 186, 226);
+}
+.yellow {
+    background: rgb(226, 206, 116);
+}
+.orange {
+    background: rgb(226, 160, 116);
+}
+.labels {
+    margin: 5px 0;
+}
+.labelBox{
+    width: 100%;
+    height: 20px;
+    cursor: pointer;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+.colorBox{
+    width: 30px;
+    height: 30px;
+    margin: 5px 0;
+}
+.colorBoxSmal{
+    width: 25px;
+    height: 5px;
+    margin: 5px 0;
+}
+.smallTitle{
+    font-size: .7rem;
+    font-weight: bold;
+    color: rgb(87, 87, 87);
+    text-transform: uppercase;
+    margin: 0;
+}
+.closeLabelMenu{
+    background: none;
+    color: #adadad;
+    transition: .4s;
+}
+.closeLabelMenu:hover, .closeLabelMenu:focus{
+    color: #2c2c2c;
 }

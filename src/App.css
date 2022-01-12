@@ -31,6 +31,12 @@ form{
 .justifyCntBtwn{
   justify-content: space-between;
 }
+.justifyCntEvn{
+  justify-content: space-evenly;
+}
+.justifyCntStrt{
+  justify-content: start;
+}
 .w100{
   width: 100%;
 }

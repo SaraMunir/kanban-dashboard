@@ -1,14 +1,20 @@
 import React, {useEffect, useState, useRef} from 'react'
 import './Styles/general.css';
 import { v4 as uuidv4 } from 'uuid';
+import CardDetail from './CardDetail';
+import Cards from './Cards';
 
 function Dashboard() {
     const [showModal, setShowModal]=useState(false)
     const [showAddLaneForm, setShowAddLaneForm]=useState(false)
     const [showAddCardForm, setShowAddCardForm]=useState(false)
+    const [showCardDetail, setShowCardDetail]=useState(false)
+    const [editInput, setEditInput]=useState({show:false, laneId:''})
+    const [cardMenu, setCardMenu]=useState({show:false, laneId:'', cardId:''})
     const [laneInput, setLaneInput]=useState({laneTittle: ''})
     const [cardInput, setCardInput]=useState({cardTittle: '', cardType: 'BUG', laneId: ''});
     const [alert, setAlert] = useState({show: false, alertText: ''})
+    const [selectedCard, setSelectedCard] =  useState({})
     const [allLanes, setAllLanes]=useState([]);
     const [draggedCard, setDraggedCard]=useState({})
     const inputLaneTittle = useRef();
@@ -23,6 +29,7 @@ function Dashboard() {
             setAlert({show:true, alertText:'Please provide title of Lane'});
             return;
         }
+        // creating an object to push in the local storage
         const laneObject ={
             laneId: laneId,
             laneTittle: laneInput.laneTittle,
@@ -87,7 +94,6 @@ function Dashboard() {
                 if(lane.cards){
                     lane.cards.push(newCardObj)
                 }
-                // console.log(lane)
             }
         })
         localStorage.setItem("lanes",  JSON.stringify(newCopy))
@@ -126,31 +132,37 @@ function Dashboard() {
         const {id, value} = e.target;
         setCardInput({...cardInput,[id]:value})
     }
-    const openModal =(type, laneId)=>{
+    const openModal =(type, laneId, cardId)=>{
         setShowModal(!showModal)
         if(type === "addLane"){
             setShowAddLaneForm(true)
             setShowAddCardForm(false)
+            setShowCardDetail(false)
         }
         if(type === "addCard"){
             setShowAddCardForm(true)
             setShowAddLaneForm(false)
+            setShowCardDetail(false)
             setCardInput({...cardInput, laneId:laneId})
+        }
+        if(type === "editCard"){
+            setShowCardDetail(true)
+            setSelectedCard({laneId: laneId, cardId: cardId})
+            setCardMenu({show:false, laneId:'', cardId:''})
         }
     }
     const closeModal =()=>{
         setShowModal(!showModal)
         setShowAddCardForm(false)
         setShowAddLaneForm(false)
+        setShowCardDetail(false)
         setAlert({show: false, alertText: ''})
+        setSelectedCard({})
     }
     const loadData = ()=>{
         // check if local storage has lanes object
         if(localStorage.lanes){
-            // console.log(JSON.parse(localStorage.lanes))
             setAllLanes(JSON.parse(localStorage.lanes))
-        }else {
-            console.log('no local storage')
         }
     }
     const allowDrop = (e)=>{
@@ -196,6 +208,38 @@ function Dashboard() {
     const startDragging = (e, card)=>{
         // e.preventDefault();
         setDraggedCard(card)
+    }
+    const showingInputForm = (laneId)=>{
+        setEditInput({show: true, laneId:laneId})
+    }
+    const showingCardMenu = (cardId)=>{
+        if(!cardMenu.show){
+            setCardMenu({show: true, cardId: cardId})
+        }else{
+            setCardMenu({show: false, cardId: ''})
+        }
+    }
+    const handleLaneTitleInput=(e)=>{
+        // updating lane title value in the lanes
+        const{value, id} = e.target;
+        const newArr=[...allLanes]
+        newArr.forEach(lane=>{
+            if(lane.laneId=== id){
+                lane.laneTittle=value
+            }
+        })
+        setAllLanes([...newArr])
+    }
+    const cancelEdit=()=>{
+        setEditInput({show:false, laneId:''})
+        loadData()
+    }
+    const saveLaneTiltleName=(e)=>{
+        e.preventDefault()
+        const newArr=[...allLanes]
+        setEditInput({show:false, laneId:''})
+        localStorage.setItem("lanes",  JSON.stringify(newArr))
+        loadData()
     }
     useEffect(()=>{
         // loading all the data
@@ -247,6 +291,11 @@ function Dashboard() {
                         : null
                     }
                     {
+                        showCardDetail ?
+                        <CardDetail selectedCard={selectedCard} loadData={loadData} setAllLanes={setAllLanes} allLanes={allLanes} />
+                        :null
+                    }
+                    {
                         alert.show ?
                         <p className='alertText'>{alert.alertText}</p>
                         :null
@@ -259,22 +308,31 @@ function Dashboard() {
                 {allLanes.length>0?
                 allLanes.map(lane=>
                     <div key={lane.laneId} className="lane"  onDragOver={allowDrop} onDrop={(e)=>dropCard(e, lane)}>
+                        {
+                            editInput.show===true && editInput.laneId === lane.laneId ?
+                            <div className="flexRow justifyCntBtwn w100">
+                            <form className='editForm' onSubmit={saveLaneTiltleName}>
+                                <label htmlFor={lane.laneId} className='sr-only'> title </label>
+                                <input className='editTitleInput' type="text" value={lane.laneTittle} id={lane.laneId} onChange={handleLaneTitleInput}/>
+                            </form>
+                            <button className='cancelEdit' onClick={saveLaneTiltleName}><i className="fas fa-check"></i></button>
+                            <button className='cancelEdit' onClick={cancelEdit}><i className="fas fa-times"></i></button>
+                        </div>
+                        :
+
                         <div className="flexRow justifyCntBtwn w100">
-                            <h3>{lane.laneTittle} &nbsp;{lane.cards?`(${lane.cards.length})`:null}</h3>
+                            <div>
+                                <p className='laneTitle' onClick={()=>showingInputForm(lane.laneId)}>{lane.laneTittle} &nbsp;{lane.cards?`(${lane.cards.length})`:null}</p>
+                            </div>
                             <button className='deleteLaneBtn' onClick={()=>deleteLane(lane.laneId)}><i className="fas fa-times"></i></button>
                         </div>
+                        }
                         <button className='addCardBtn' onClick={()=>openModal('addCard', lane.laneId)}><i className="fas fa-plus"></i></button>
                         <ul className="laneContent">
                             {
                                 lane.cards.length>0?
                                 lane.cards.map(card=>
-                                    <li className='card' key={card.id} draggable="true" onDragStart={(e)=>startDragging(e,card)}>
-                                        <div className="flexRow justifyCntBtwn w100">
-                                            <p className={`cardType ${card.cardType}`}><i className="fas fa-circle"></i> {card.cardType}</p>
-                                            <button className='deleteCardBtn' onClick={()=>deleteCard(lane.laneId, card.id)}><i className="fas fa-times"></i></button>
-                                        </div>
-                                        <h4>{card.cardTittle}</h4>
-                                    </li>
+                                    <Cards  key={card.id}  card={card} startDragging={startDragging} showingCardMen={showingCardMenu} cardMenu={cardMenu} deleteCard={deleteCard} lane={lane} openModal={openModal} showingCardMenu ={showingCardMenu }/>
                                     )
                                 : 
                                 <li className='card'>No cards</li>
