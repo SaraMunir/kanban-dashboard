@@ -103,7 +103,7 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
 
     }
     const loadDetails =()=>{
-        allLanes.map(lane=>{
+        allLanes.forEach(lane=>{
             const newLabelCopy = [...labels]
             if(lane.laneId === selectedCard.laneId){
                 // setting all cards
