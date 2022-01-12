@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
 
-    const [laneDetail, setLaneDetail]=useState({})
     const [cardDetail, setCardDetail]=useState({})
     const [cardColors, setCardColors]=useState([])
     const [showDescriptionForm, setShowDescriptionForm]=useState(false)
@@ -32,7 +31,6 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
     ])
     const addDescription=(e)=>{
         e.preventDefault()
-        console.log(descInput)
         // saving the desicription
         const copyLanes = [...allLanes];
         copyLanes.forEach(lane=>{
@@ -40,7 +38,6 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
                 lane.cards.forEach(card=>{
                     if(card.id === selectedCard.cardId){
                         card.cardDesc = descInput
-                        console.log(card)
                         setCardDetail(card)
                     }
                 })
@@ -88,7 +85,7 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
             if(lane.laneId===selectedCard.laneId){
                 lane.cards.forEach(card=>{
                     if(card.id === selectedCard.cardId){
-                        const filteredColorList = card.colors.filter(color=>{return color !=selectedColor})
+                        const filteredColorList = card.colors.filter(color=>{return color !==selectedColor})
                         card.colors = filteredColorList
                     }
                 })
@@ -110,7 +107,6 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
             const newLabelCopy = [...labels]
             if(lane.laneId === selectedCard.laneId){
                 // setting all cards
-                setLaneDetail(lane)
                 lane.cards.map(card=>{
                     if(card.id===selectedCard.cardId){
                         // setting card detail

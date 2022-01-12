@@ -171,7 +171,6 @@ function Dashboard() {
     const dropCard = (e, lane)=>{
         e.preventDefault();
         if(draggedCard.laneId === lane.laneId){
-            console.log('dont do anything else')
             // if the cards are dropped in their original lane do nothing
             return
         }else{
