@@ -141,7 +141,6 @@
     margin: 10px auto;
 }
 .modal form button{
-    width: 30%;
     padding: 10px;
     margin-left: auto;
 }
@@ -309,4 +308,25 @@
 }
 .closeLabelMenu:hover, .closeLabelMenu:focus{
     color: #2c2c2c;
+}
+
+
+@media (max-width: 650px){
+
+    .modal {
+        min-height: 40vh;
+        width: 60%;
+        min-height: 65vh;
+        width: 87%;
+        }
+    .modal form {
+        min-height: 45vh;
+        justify-content: space-evenly;
+    }
+}
+@media (max-width: 500px){
+    .lane {
+        width: 355px;
+        margin: 5px auto;
+        }
 }

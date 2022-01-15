@@ -344,7 +344,12 @@ function Dashboard() {
                                 : 
                                 <li className='card'>No cards</li>
                             }
-                            <li className='emptyCard'>move card here</li>
+                            {
+                                allLanes.length>1 ?
+                                <li className='emptyCard'>move card here</li>
+                                :null
+
+                            }
                         </ul>
                     </div>
                 )

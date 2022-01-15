@@ -131,7 +131,6 @@ function CardDetail({selectedCard, allLanes, loadData, setAllLanes}) {
     }
     useEffect(()=>{
         loadDetails()
-        console.log('what?')
     },[showDescriptionForm])
     return (
         <div className='cardDetail'>
